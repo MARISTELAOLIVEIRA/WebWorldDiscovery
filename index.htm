@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descubra Seu Mundo</title>
+    
+    <link rel="icon" href="https://edube.org/uploads/media/default/0001/04/web-favicon.png" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .discover-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .discover-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            background: linear-gradient(45deg, #2980b9, #3498db);
+        }
+
+        .discover-btn:active {
+            transform: translateY(0);
+        }
+
+        .map-container {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .map-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .map-container:hover img {
+            transform: scale(1.02);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .close:hover {
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .info-item:hover {
+            transform: translateX(5px);
+            background: #e9ecef;
+        }
+
+        .info-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+
+        .river-icon { color: #3498db; }
+        .mountain-icon { color: #8d4004; }
+        .landmark-icon { color: #e74c3c; }
+
+        .info-text {
+            flex: 1;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #7f8c8d;
+            line-height: 1.4;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+    
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Descubra Seu Mundo &#x1F30D</h1> 
+        <p class="subtitle">Clique no botão para descobrir sobre o continente em que você está e algumas características geográficas famosas. Ou clique diretamente em qualquer continente no mapa!</p>
+        
+        <button id="discoverLocation" class="discover-btn">
+            <i class="fas fa-location-arrow"></i> Descobrir Minha Localização
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Obtendo sua localização...</p>
+        </div>
+
+        <div class="map-container">
+            <img src="https://edube.org/uploads/media/default/0001/04/continents.jpg" usemap="#image-map" alt="Mapa Mundi">
+            <map name="image-map">
+                <area target="" alt="América do Norte" title="América do Norte" id="north-america" coords="386,283,41,17" shape="rect" href="javascript:void(0);">
+                <area target="" alt="América do Sul" title="América do Sul" id="south-america" coords="209,501,358,288" shape="rect" href="javascript:void(0);">
+                <area target="" alt="Europa" title="Europa" id="europe" coords="391,68,505,217" shape="rect" href="javascript:void(0);">
+                <area target="" alt="África" title="África" id="africa" coords="533,217,387,448" shape="rect" href="javascript:void(0);">
+                <area target="" alt="Ásia" title="Ásia" id="asia" coords="893,153,506,1" shape="rect" href="javascript:void(0);">
+                <area target="" alt="Austrália e Oceania" title="Austrália e Oceania" id="australia-and-oceania" coords="679,353,872,480" shape="rect" href="javascript:void(0);">
+            </map>
+        </div>
+    </div>
+
+    <!-- Modal para exibir informações -->
+    <div id="continentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="continentName"></h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="info-item">
+                    <div class="info-icon river-icon">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="info-text">
+                        <div class="info-label">Rio Principal</div>
+                        <div class="info-value" id="riverInfo"></div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon mountain-icon">
+                        <i class="fas fa-mountain"></i>
+                    </div>
+                    <div class="info-text">
+                        <div class="info-label">Montanha Famosa</div>
+                        <div class="info-value" id="mountainInfo"></div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon landmark-icon">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <div class="info-text">
+                        <div class="info-label">Pontos Turísticos</div>
+                        <div class="info-value" id="landmarksInfo"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
+<!-- JavaScript code provided by your teammate -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const continentInfo = {
+    'north-america': {
+      continent: 'América do Norte',
+      river: 'Rio Mississippi',
+      mountain: 'Denali',
+      landmarks: 'Grand Canyon, Estátua da Liberdade, Cataratas do Niágara'
+    },
+    'south-america': {
+      continent: 'América do Sul',
+      river: 'Rio Amazonas',
+      mountain: 'Aconcágua',
+      landmarks: 'Machu Picchu, Ilhas Galápagos'
+    },
+    'europe': {
+      continent: 'Europa',
+      river: 'Rio Danúbio',
+      mountain: 'Monte Branco',
+      landmarks: 'Torre Eiffel, Coliseu, Acrópole de Atenas'
+    },
+    'africa': {
+      continent: 'África',
+      river: 'Rio Nilo',
+      mountain: 'Monte Kilimanjaro',
+      landmarks: 'Esfinge, Montanha da Mesa'
+    },
+    'asia': {
+      continent: 'Ásia',
+      river: 'Rio Yangtzé',
+      mountain: 'Monte Everest',
+      landmarks: 'Grande Muralha da China, Petra'
+    },
+    'australia-and-oceania': {
+      continent: 'Austrália e Oceania',
+      river: 'Rio Murray',
+      mountain: 'Monte Kosciuszko',
+      landmarks: 'Ópera de Sydney, Grande Barreira de Corais, Uluru'
+    }
+  };
+
+  // Elementos do modal
+  const modal = document.getElementById('continentModal');
+  const closeBtn = document.querySelector('.close');
+  const loading = document.getElementById('loading');
+
+  function displayContinentInfo(continentId) {
+    const info = continentInfo[continentId];
+    if (info) {
+      // Preencher o modal com as informações
+      document.getElementById('continentName').textContent = info.continent;
+      document.getElementById('riverInfo').textContent = info.river;
+      document.getElementById('mountainInfo').textContent = info.mountain;
+      document.getElementById('landmarksInfo').textContent = info.landmarks;
+      
+      // Mostrar o modal
+      modal.style.display = 'block';
+      
+      // Adicionar animação de entrada
+      setTimeout(() => {
+        modal.querySelector('.modal-content').style.animation = 'modalSlideIn 0.3s ease';
+      }, 10);
+    } else {
+      alert('Informações não disponíveis');
+    }
+  }
+
+  // Fechar modal
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  // Fechar modal clicando fora dele
+  window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  // Event listeners para as áreas do mapa
+  document.querySelectorAll('area').forEach(area => {
+    area.addEventListener('click', function() {
+      const continentId = this.id;
+      displayContinentInfo(continentId);
+    });
+
+    // Adicionar efeito hover (opcional, para melhor UX)
+    area.addEventListener('mouseenter', function() {
+      this.style.cursor = 'pointer';
+    });
+  });
+
+  const discoverLocationButton = document.getElementById('discoverLocation');
+  
+  discoverLocationButton.addEventListener('click', () => {
+    if ("geolocation" in navigator) {
+      // Mostrar loading
+      loading.style.display = 'block';
+      discoverLocationButton.style.display = 'none';
+      
+      navigator.geolocation.getCurrentPosition((position) => {
+        // Esconder loading
+        loading.style.display = 'none';
+        discoverLocationButton.style.display = 'block';
+        
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const continentId = determineContinentByGeo(latitude, longitude);
+        
+        if (continentId) {
+          displayContinentInfo(continentId);
+        }
+      }, (error) => {
+        // Esconder loading em caso de erro
+        loading.style.display = 'none';
+        discoverLocationButton.style.display = 'block';
+        
+        let errorMessage = "Erro ao obter geolocalização: ";
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += "Permissão negada pelo usuário.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += "Informação de localização não disponível.";
+            break;
+          case error.TIMEOUT:
+            errorMessage += "Tempo limite para obter localização.";
+            break;
+          default:
+            errorMessage += error.message;
+            break;
+        }
+        alert(errorMessage);
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      });
+    } else {
+      alert("Geolocalização não é suportada pelo seu navegador.");
+    }
+  });
+
+  function determineContinentByGeo(latitude, longitude) {
+    if (latitude > 35 && longitude > -10 && longitude < 40) {
+      return 'europe';
+    } else if (latitude < 0 && longitude > -80 && longitude < -34) {
+      return 'south-america';
+    } else if (latitude > 0 && longitude > -130 && longitude < -70) {
+      return 'north-america';
+    } else if (latitude > 5 && latitude < 60 && longitude > 40 && longitude < 180) {
+      return 'asia';
+    } else if (latitude > -35 && latitude < 35 && longitude > 10 && longitude < 50) {
+      return 'africa';
+    } else if (latitude < -10 && longitude > 110 && longitude < 180) {
+      return 'australia-and-oceania';
+    }
+    alert("O continente não pôde ser determinado com base na sua localização.");
+    return null;
+  }
+
+  // Adicionar efeito de teclado (ESC para fechar modal)
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal.style.display === 'block') {
+      modal.style.display = 'none';
+    }
+  });
+});
+
+</script>
